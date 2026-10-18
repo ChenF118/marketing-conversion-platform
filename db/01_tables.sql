@@ -1,0 +1,159 @@
+-- fans schema v3（营销平台：数据归属、事件幂等、日期类型、索引）
+CREATE DATABASE IF NOT EXISTS monitor_atr DEFAULT CHARACTER SET utf8;
+CREATE DATABASE IF NOT EXISTS wx_atr DEFAULT CHARACTER SET utf8;
+CREATE DATABASE IF NOT EXISTS wx_access DEFAULT CHARACTER SET utf8;
+CREATE DATABASE IF NOT EXISTS conversion_atr DEFAULT CHARACTER SET utf8;
+
+CREATE TABLE IF NOT EXISTS monitor_atr.edition_landing (
+  id INT(11) NOT NULL AUTO_INCREMENT,
+  ownerId INT(11) DEFAULT NULL,
+  uid INT(11) DEFAULT NULL,
+  gid INT(11) DEFAULT NULL,
+  url VARCHAR(500) DEFAULT NULL,
+  remarks VARCHAR(255) DEFAULT NULL,
+  delivery TINYINT(1) DEFAULT '0',
+  track TINYINT(1) DEFAULT '0',
+  enable TINYINT(1) DEFAULT '1',
+  erweima MEDIUMTEXT,
+  sourceUrl VARCHAR(255) DEFAULT NULL,
+  weixin VARCHAR(100) DEFAULT NULL,
+  mclick VARCHAR(255) DEFAULT NULL,
+  mtouch VARCHAR(255) DEFAULT NULL,
+  pclick VARCHAR(255) DEFAULT NULL,
+  pselect VARCHAR(255) DEFAULT NULL,
+  visible TINYINT(1) DEFAULT '0',
+  share TINYINT(1) DEFAULT '0',
+  same VARCHAR(255) DEFAULT NULL,
+  total INT(11) DEFAULT '0',
+  cvscount INT(11) DEFAULT '0',
+  fans INT(11) DEFAULT '0',
+  neardate DATETIME DEFAULT NULL,
+  createTime DATETIME DEFAULT NULL,
+  updateTime DATETIME DEFAULT NULL,
+  PRIMARY KEY (id),
+  KEY idx_owner (ownerId),
+  KEY idx_uid (uid),
+  KEY idx_enable (enable),
+  KEY idx_url (url(191))
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS monitor_atr.edition_group (
+  id INT(11) NOT NULL AUTO_INCREMENT,
+  ownerId INT(11) DEFAULT NULL,
+  groupName VARCHAR(100) DEFAULT NULL,
+  remarks VARCHAR(255) DEFAULT NULL,
+  total INT(11) DEFAULT '0',
+  createTime DATETIME DEFAULT NULL,
+  updateTime DATETIME DEFAULT NULL,
+  PRIMARY KEY (id),
+  KEY idx_owner (ownerId),
+  KEY idx_name (groupName)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS monitor_atr.cvsmsg_link (
+  id INT(11) NOT NULL AUTO_INCREMENT,
+  ownerId INT(11) DEFAULT NULL,
+  uid INT(11) DEFAULT NULL,
+  type VARCHAR(50) DEFAULT NULL,
+  cvstype INT(11) DEFAULT NULL,
+  cvscount INT(11) DEFAULT '0',
+  cvsmode INT(11) DEFAULT '0',
+  code VARCHAR(500) DEFAULT NULL,
+  second INT(11) DEFAULT '0',
+  createTime DATETIME DEFAULT NULL,
+  updateTime DATETIME DEFAULT NULL,
+  PRIMARY KEY (id),
+  KEY idx_owner (ownerId),
+  KEY idx_uid (uid)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS monitor_atr.cvsmsg_type (
+  id INT(11) NOT NULL AUTO_INCREMENT,
+  typename VARCHAR(100) DEFAULT NULL,
+  typeint INT(11) DEFAULT NULL,
+  createTime DATETIME DEFAULT NULL,
+  updateTime DATETIME DEFAULT NULL,
+  PRIMARY KEY (id),
+  KEY idx_typeint (typeint)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS monitor_atr.cvsmsg_one (
+  id INT(11) NOT NULL AUTO_INCREMENT,
+  uid INT(11) DEFAULT NULL,
+  eventId VARCHAR(64) DEFAULT NULL,
+  cvsdate DATE DEFAULT NULL,
+  cvstime TIME DEFAULT NULL,
+  stay INT(11) DEFAULT '0',
+  type INT(11) DEFAULT NULL,
+  target VARCHAR(255) DEFAULT NULL,
+  city TEXT,
+  equipment VARCHAR(100) DEFAULT NULL,
+  rate VARCHAR(50) DEFAULT NULL,
+  wx VARCHAR(100) DEFAULT NULL,
+  search VARCHAR(255) DEFAULT NULL,
+  total INT(11) DEFAULT '0',
+  report INT(11) DEFAULT '0',
+  createTime DATETIME DEFAULT NULL,
+  updateTime DATETIME DEFAULT NULL,
+  PRIMARY KEY (id),
+  UNIQUE KEY uk_event (eventId),
+  KEY idx_uid (uid),
+  KEY idx_cvsdate (cvsdate),
+  KEY idx_wx (wx)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS monitor_atr.user_admin (
+  id INT(11) NOT NULL AUTO_INCREMENT,
+  username VARCHAR(50) NOT NULL,
+  password VARCHAR(255) NOT NULL,
+  header MEDIUMTEXT,
+  power INT(11) DEFAULT '0',
+  createTime DATETIME DEFAULT NULL,
+  updateTime DATETIME DEFAULT NULL,
+  PRIMARY KEY (id),
+  UNIQUE KEY uk_username (username),
+  KEY idx_power (power)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS wx_atr.manage_wxnumber (
+  id INT(11) NOT NULL AUTO_INCREMENT,
+  ownerId INT(11) DEFAULT NULL,
+  uid INT(11) DEFAULT NULL,
+  wxh VARCHAR(100) DEFAULT NULL,
+  wxname VARCHAR(100) DEFAULT NULL,
+  erweima MEDIUMTEXT,
+  sex VARCHAR(10) DEFAULT NULL,
+  online TINYINT(1) DEFAULT '0',
+  control INT(11) DEFAULT '0',
+  level INT(11) DEFAULT '0',
+  remarks VARCHAR(255) DEFAULT NULL,
+  visits INT(11) DEFAULT '0',
+  copyCount INT(11) DEFAULT '0',
+  report INT(11) DEFAULT '0',
+  createTime DATETIME DEFAULT NULL,
+  updateTime DATETIME DEFAULT NULL,
+  PRIMARY KEY (id),
+  KEY idx_owner (ownerId),
+  KEY idx_uid (uid),
+  KEY idx_online (online)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS wx_atr.manage_wxgroup (
+  id INT(11) NOT NULL AUTO_INCREMENT,
+  ownerId INT(11) DEFAULT NULL,
+  name VARCHAR(100) DEFAULT NULL,
+  remarks VARCHAR(255) DEFAULT NULL,
+  createTime DATETIME DEFAULT NULL,
+  updateTime DATETIME DEFAULT NULL,
+  PRIMARY KEY (id),
+  KEY idx_owner (ownerId),
+  KEY idx_name (name)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS wx_access.access_token (
+  id INT(11) NOT NULL AUTO_INCREMENT,
+  access VARCHAR(500) DEFAULT NULL,
+  createTime DATETIME DEFAULT NULL,
+  updateTime DATETIME DEFAULT NULL,
+  PRIMARY KEY (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;

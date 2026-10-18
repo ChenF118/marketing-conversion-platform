@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>落地页演示 - 好多了</title>
+  <style>
+    :root {
+      --bg: #f5f6f8;
+      --card: #ffffff;
+      --text: #1f2329;
+      --sub: #646a73;
+      --primary: #2f6bff;
+      --ok: #00a870;
+      --warn: #ed7b2f;
+      --line: #e5e6eb;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; background: var(--bg); color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+    }
+    .wrap { max-width: 1080px; margin: 0 auto; padding: 24px 16px 48px; }
+    .topbar { display: flex; align-items: center; gap: 10px; margin-bottom: 18px; }
+    .topbar .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--ok); }
+    .topbar h1 { font-size: 18px; margin: 0; font-weight: 600; }
+    .topbar .tag { font-size: 12px; color: var(--sub); border: 1px solid var(--line); padding: 2px 8px; border-radius: 20px; }
+    .grid { display: grid; grid-template-columns: 380px 1fr; gap: 20px; }
+    @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
+    .card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 20px; }
+    .pageurl { font-size: 12px; color: var(--sub); word-break: break-all; line-height: 1.6; }
+    .pageurl b { color: var(--text); }
+    .wxcard { border: 1px solid var(--line); border-radius: 12px; padding: 14px; margin-top: 14px; }
+    .wxhead { display: flex; align-items: center; gap: 10px; }
+    .avatar { width: 42px; height: 42px; border-radius: 50%; background: #eef2ff; color: var(--primary); display: flex; align-items: center; justify-content: center; font-weight: 600; }
+    .wxname { font-weight: 600; }
+    .wxh { font-size: 12px; color: var(--sub); }
+    .qrbox { margin: 14px 0; display: flex; justify-content: center; }
+    .qrbox img { width: 200px; height: 200px; border-radius: 10px; border: 1px solid var(--line); background: #fff; object-fit: contain; }
+    .qrph { width: 200px; height: 200px; border: 1px dashed #c9cdd4; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: var(--sub); font-size: 12px; text-align: center; padding: 10px; }
+    .btns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    button {
+      border: 1px solid var(--line); background: #fff; color: var(--text); border-radius: 10px;
+      padding: 10px 12px; font-size: 13px; cursor: pointer; transition: .15s;
+    }
+    button:hover { border-color: var(--primary); color: var(--primary); }
+    button.primary { background: var(--primary); border-color: var(--primary); color: #fff; }
+    button.primary:hover { opacity: .9; color: #fff; }
+    .tip { font-size: 12px; color: var(--sub); line-height: 1.8; margin-top: 10px; }
+    .empty { text-align: center; padding: 30px 10px; color: var(--sub); font-size: 13px; line-height: 2; }
+    .empty code { background: #f2f3f5; padding: 1px 6px; border-radius: 4px; color: #c0392b; }
+    .log { font-family: ui-monospace, Consolas, monospace; font-size: 12px; background: #0f172a; color: #cbd5e1; border-radius: 14px; padding: 14px; height: 520px; overflow: auto; line-height: 1.55; }
+    .log .entry { margin-bottom: 10px; border-bottom: 1px dashed #1e293b; padding-bottom: 8px; }
+    .log .path { color: #93c5fd; }
+    .log .st200 { color: #4ade80; }
+    .log .stbad { color: #f87171; }
+    .log pre { margin: 4px 0 0; white-space: pre-wrap; word-break: break-all; color: #e2e8f0; }
+    .hint { background: #fff7e8; border: 1px solid #ffe4ba; color: #8a5a00; padding: 10px 12px; border-radius: 10px; font-size: 12px; line-height: 1.8; margin-top: 12px; }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <span class="dot"></span>
+    <h1>落地页演示</h1>
+    <span class="tag">真实调用后端接口</span>
+  </div>
+
+  <div class="grid">
+    <div>
+      <div class="card">
+        <div class="pageurl">
+          当前页面地址（用于匹配落地页）：<br /><b id="pageurl"></b>
+        </div>
+        <div id="content" class="empty">正在加载落地页配置…</div>
+        <div class="btns" style="margin-top:14px">
+          <button class="primary" onclick="loadConfig()">刷新配置</button>
+          <button onclick="simulateVisit()">模拟一次访问</button>
+        </div>
+        <div class="hint">
+          说明：这是模拟的 H5 落地页。真实投放时，把你的落地页套上同样两步即可：
+          ① 打开时调 <code>/cvslink/flg</code> 拉取本页绑定的微信号；
+          ② 用户点击/复制/长按时调 <code>/monitor/append</code> 上报行为。
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <b style="font-size:14px">请求日志（实时）</b>
+        <button onclick="document.getElementById('log').innerHTML=''">清空</button>
+      </div>
+      <div id="log" class="log"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const API = location.origin;
+  const qs = new URLSearchParams(location.search);
+  const pageUrl = qs.get('url') || (location.origin + '/demo/landing.html');
+  const state = { link: null, landingId: null, wxList: [] };
+
+  document.getElementById('pageurl').textContent = pageUrl;
+
+  function esc(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  function log(path, req, status, resp) {
+    const box = document.getElementById('log');
+    const cls = status >= 200 && status < 300 ? 'st200' : 'stbad';
+    const el = document.createElement('div');
+    el.className = 'entry';
+    el.innerHTML =
+      '<div><span class="path">POST ' + esc(path) + '</span> ' +
+      '<span class="' + cls + '">HTTP ' + status + '</span></div>' +
+      '<pre>req  ' + esc(JSON.stringify(req || {})) + '</pre>' +
+      '<pre>resp ' + esc(JSON.stringify(resp).slice(0, 1200)) + '</pre>';
+    box.prepend(el);
+  }
+
+  async function api(path, body) {
+    try {
+      const res = await fetch(API + path, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body || {}),
+      });
+      const text = await res.text();
+      let data = null;
+      try { data = text ? JSON.parse(text) : null; } catch (e) { data = text; }
+      log(path, body, res.status, data);
+      return { status: res.status, data: data };
+    } catch (e) {
+      log(path, body, 0, String(e));
+      return { status: 0, data: null };
+    }
+  }
+
+  async function loadConfig() {
+    const box = document.getElementById('content');
+    box.className = 'empty';
+    box.textContent = '正在加载落地页配置…';
+    const r = await api('/cvslink/flg', { words: pageUrl });
+    const link = r.data;
+    if (!link || !link.landing) {
+      state.link = null; state.wxList = [];
+      box.className = 'empty';
+      box.innerHTML =
+        '没有找到这个地址对应的启用中落地页。<br />请检查：' +
+        '<br />1) 落地页管理里已添加该 URL 且「启用」；' +
+        '<br />2) 已给该落地页「绑定微信」；' +
+        '<br />3) 转化统计 → 统计链接里已为该落地页新增一条。' +
+        '<br /><span style="font-size:12px">（也可以直接运行 <code>db/seed-demo.ps1</code> 生成演示数据）</span>';
+      return;
+    }
+    state.link = link;
+    state.landingId = link.landing.id;
+    const group = link.landing.Wxgroup;
+    state.wxList = (group && group.Weixin) || [];
+
+    if (!state.wxList.length) {
+      box.className = 'empty';
+      box.innerHTML = '落地页已找到（ID ' + esc(link.landing.id) + '），但绑定的微信分组下没有「在线」的微信号。';
+      return;
+    }
+
+    box.className = '';
+    box.innerHTML = state.wxList.map(function (wx, i) {
+      const qr = wx.erweima
+        ? '<img src="' + esc(wx.erweima) + '" alt="二维码" onerror="this.style.display=\'none\'" />'
+        : '<div class="qrph">未配置二维码<br />erweima 为空</div>';
+      return '' +
+        '<div class="wxcard">' +
+          '<div class="wxhead">' +
+            '<div class="avatar">' + esc((wx.wxname || '微').slice(0, 1)) + '</div>' +
+            '<div><div class="wxname">' + esc(wx.wxname || '未命名') + '</div>' +
+            '<div class="wxh">微信号：' + esc(wx.wxh) + '　权重：' + esc(wx.level) + '</div></div>' +
+          '</div>' +
+          '<div class="qrbox">' + qr + '</div>' +
+          '<div class="btns">' +
+            '<button class="primary" onclick="act(' + i + ',3)">复制微信号</button>' +
+            '<button onclick="act(' + i + ',2)">长按识别</button>' +
+            '<button onclick="act(' + i + ',1)">点击咨询</button>' +
+            '<button onclick="act(' + i + ',4)">打开微信</button>' +
+          '</div>' +
+        '</div>';
+    }).join('');
+  }
+
+  function pad(n) { return String(n).padStart(2, '0'); }
+  function nowParts() {
+    const d = new Date();
+    return {
+      date: d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()),
+      time: pad(d.getHours()) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds()),
+    };
+  }
+
+  async function simulateVisit() {
+    if (!state.landingId) return loadConfig();
+    const wx = state.wxList[0] ? state.wxList[0].wxh : '';
+    // 只记一次访问（PV）：inctotal 会自增落地页 total 与微信号 visits
+    await api('/monitor/inctotal', { url: state.landingId, wx: wx });
+  }
+
+  async function act(index, type) {
+    const wx = state.wxList[index];
+    if (!wx) return;
+    if (type === 3 && navigator.clipboard) {
+      try { await navigator.clipboard.writeText(wx.wxh); } catch (e) {}
+    }
+    const t = nowParts();
+    await api('/monitor/append', {
+      url: state.landingId,
+      wx: wx.wxh,
+      cvsdate: t.date,
+      cvstime: t.time,
+      stay: 3,
+      type: type,
+      targetelement: 'demo-button-' + type,
+      city: { cip: '127.0.0.1' },
+      equipment: navigator.platform,
+      rate: '',
+      search: '',
+      total: 1,
+      report: 0,
+    });
+  }
+
+  loadConfig();
+</script>
+</body>
+</html>

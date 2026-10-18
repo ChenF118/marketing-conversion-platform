@@ -1,0 +1,24 @@
+# dependencies / build output
+Fans_java/target/
+Fans_Vue/node_modules/
+Fans_Vue/dist/
+Fans_Vue/.cache/
+tools/out/
+
+# local secrets & runtime data
+.env
+uploads/
+*.log
+serve.log
+
+# IDE / OS
+.idea/
+.vscode/
+*.iml
+*.suo
+.DS_Store
+Thumbs.db
+
+# test / coverage
+*.exec
+coverage/
