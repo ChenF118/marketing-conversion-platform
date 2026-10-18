@@ -6,6 +6,7 @@
 - 前端：Vue 2 + Element UI + ECharts
 - 部署形态：前后端分离，REST API，JWT 无状态鉴权
 - 交付状态：**60+ 接口、65 项接口回归全部通过**
+- 接口清单：[Fans_java/docs/API_MAPPING.md](Fans_java/docs/API_MAPPING.md)
 
 ---
 
